@@ -1,17 +1,20 @@
 import os
 import requests
+import urllib3
 import time
 import base64
 import json
 import threading
 from collections import defaultdict, deque
 
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
 # Aruba IoT Gateway configuration
 APIGW_URL = os.getenv('APIGW_URL', 'http://192.168.1.92:31080')
 # Add http:// if missing
 if not APIGW_URL.startswith('http://') and not APIGW_URL.startswith('https://'):
     APIGW_URL = f'http://{APIGW_URL}'
-APIKEY = os.getenv('APIKEY', '69a54a133b2c436ce3a31580-0-3')
+APIKEY = os.getenv('APIKEY', '69a54a133b2c436ce3a31580-0-9')
 HEADERS = {"accept": "application/json", "apikey": APIKEY}
 
 # MACs identifies comme bracelets Corsano 287-2B
@@ -88,7 +91,7 @@ def _start_notification_listener():
                         packet_count += 1
                         
                         # Print every 20 packets
-                        if packet_count % 200 == 0:
+                        if packet_count % 5 == 0:
                             print_stats()
 
         except Exception as e:
@@ -99,17 +102,14 @@ def _start_notification_listener():
     return thread
 
 def main():
-    print("="*60)
-    print("  RSSI Monitor - Simple Test")
-    print("="*60)
-    
+   
     # Start listening
-    print("Starting BLE packet stream...")
+    print("Starting RSSI Monitor...")
     listener_thread = _start_notification_listener()
     
     try:
         while True:
-            time.sleep(1)
+            time.sleep(10)
     except KeyboardInterrupt:
         print("\n\nStopping...")
         print_stats()
